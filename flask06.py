@@ -5,36 +5,42 @@ from flask import render_template
 from flask import request
 from flask import redirect, url_for
 from flask import session
-from database import db 
+from database import db
 from models import Note as Note
 from models import User as User
 from models import Comment as Comment
 from forms import RegisterForm, LoginForm, CommentForm
 import bcrypt
-from forms import LoginForm
+
 
 app = Flask(__name__)     # create an app
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flask_note_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'SE3155'
 
+
 #  Bind SQLAlchemy db object to this Flask app
 db.init_app(app)
+
 
 # Setup models
 with app.app_context():
     db.create_all()   # run under the app context
 
+
 # @app.route is a decorator. It gives the function "index" special powers.
 # In this case it makes it so anyone going to "your-url/" makes this function
 # get called. What it returns is what is shown as the web page
+@app.route('/')
 @app.route('/index')
 def index():
     # check if a user is saved in session
     if session.get('user'):
         return render_template("index.html", user=session['user'])
     return render_template("index.html")
+
 
 @app.route('/notes')
 def get_notes():
@@ -47,6 +53,7 @@ def get_notes():
        return render_template('notes.html', notes=my_notes, user=session['user'])
     else:
         return redirect(url_for('login'))
+
 
 @app.route('/notes/<note_id>')
 def get_note(note_id):
@@ -61,6 +68,7 @@ def get_note(note_id):
         return render_template('note.html', note=my_note, user=session['user'], form=form)
     else:
         return redirect(url_for('login'))
+
 
 @app.route('/notes/new', methods=['GET', 'POST'])
 def new_note():
@@ -88,6 +96,7 @@ def new_note():
     else:
         # user is not in session redirect ot login
         return redirect(url_for('login'))
+
 
 @app.route('/notes/edit/<note_id>', methods=['GET', 'POST'])
 def update_note(note_id):
@@ -117,16 +126,13 @@ def update_note(note_id):
             return render_template('new.html', note=my_note, user=session['user'])
     else:
         # user is not in session redirect to login
-        return redirect(url_for('login'))     
-
-    
-
+        return redirect(url_for('login'))
     return render_template('new.html', note=my_note, user=a_user)
+
 
 @app.route('/notes.delete/<note_id>', methods=['POST'])
 def delete_note(note_id):
     if session.get('user'):
-
         #retrieve note from database
         my_note = db.session.query(Note).filter_by(id=note_id).one()
         
@@ -137,6 +143,7 @@ def delete_note(note_id):
     else:
         # user is not in session redirect to login
         return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -162,6 +169,7 @@ def register():
     # something went wrong - display register view
     return render_template('register.html', form=form)
 
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     login_form = LoginForm()
@@ -185,6 +193,7 @@ def login():
         # form did not validate or GET request
         return render_template("login.html", form=login_form)
 
+
 @app.route('/logout')
 def logout():
     # check if a user is saved in session
@@ -192,6 +201,7 @@ def logout():
         session.clear()
 
     return redirect(url_for('index'))
+
 
 @app.route('/notes/<note_id>/comment', methods=['POST'])
 def new_comment(note_id):
@@ -211,8 +221,7 @@ def new_comment(note_id):
         return redirect(url_for('login'))
 
 
-app.run(host=os.getenv('IP', '127.0.0.1'),port=int(os.getenv('PORT', 5000)),debug=True)    
-
+app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
 # To see the web page in your web browser, go to the url,
 #   http://127.0.0.1:5000
 

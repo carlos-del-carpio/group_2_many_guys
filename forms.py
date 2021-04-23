@@ -14,9 +14,7 @@ class RegisterForm(FlaskForm):
 
     lastname = StringField('Last Name', validators=[Length(1, 20)])
 
-    email = StringField('Email', [
-        Email(message='Not a valid email address.'),
-        DataRequired()])
+    email = StringField('Email', [Email(message='Not a valid email address.'), DataRequired()])
 
     password = PasswordField('Password', [
         DataRequired(message="Please enter a password."),
@@ -49,6 +47,7 @@ class LoginForm(FlaskForm):
     def validate_email(self, field):
         if db.session.query(User).filter_by(email=field.data).count() == 0:
             raise ValidationError('Incorrect username or password.')
+
 
 class CommentForm(FlaskForm):
     class Meta:

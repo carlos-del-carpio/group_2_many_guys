@@ -1,6 +1,7 @@
 from database import db
 import datetime
 
+
 class Note(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)
     title = db.Column("title", db.String(200))
@@ -15,6 +16,7 @@ class Note(db.Model):
         self.text = text
         self.date = date
         self.user_id = user_id
+
 
 class User(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)
@@ -32,6 +34,7 @@ class User(db.Model):
         self.email = email
         self.password = password
         self.registered_on = datetime.date.today()
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
