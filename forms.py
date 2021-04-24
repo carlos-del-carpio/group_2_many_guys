@@ -11,9 +11,7 @@ class RegisterForm(FlaskForm):
         csrf = False
 
     firstname = StringField('First Name', validators=[Length(1, 10)])
-
     lastname = StringField('Last Name', validators=[Length(1, 20)])
-
     email = StringField('Email', [Email(message='Not a valid email address.'), DataRequired()])
 
     password = PasswordField('Password', [
@@ -24,6 +22,7 @@ class RegisterForm(FlaskForm):
     confirmPassword = PasswordField('Confirm Password', validators=[
         Length(min=6, max=10)
     ])
+
     submit = SubmitField('Submit')
 
     def validate_email(self, field):
@@ -53,6 +52,5 @@ class CommentForm(FlaskForm):
     class Meta:
         csrf = False
 
-    comment = TextAreaField('Comment',validators=[Length(min=1)])
-
+    comment = TextAreaField('Comment', validators=[Length(min=1)])
     submit = SubmitField('Add Comment')

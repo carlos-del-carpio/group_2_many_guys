@@ -8,13 +8,6 @@
 </head>
     <body>
         <div class="navdiv">
-
-            <nav>
-                <a href="{{ url_for('index') }}"> Home</a> ||
-                <a href="{{ url_for('get_notes') }}"> Meetings</a> ||
-                <a href="{{ url_for('new_note') }}">Add Meeting</a>
-            </nav>
-
         {% if user %}
             <nav>
                 <a href="{{url_for('logout') }}">Logout</a>
@@ -27,7 +20,7 @@
         {% endif %}
         
         </div>
-        <h1>Welcome {% if user %}{{user}}{% endif %}to UNC Meet!</h1>
+        <h1>Welcome {% if user %}{{user}}{% endif %}to Group 2 Many Guys' UNCC Events App!</h1>
 
         <h2>Make your account by filling in the fields below \/</h2>
         <div class="formwrapper">

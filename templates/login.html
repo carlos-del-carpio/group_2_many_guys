@@ -7,28 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='forms.css') }}">
 </head>
     <body>
-        <div class="navdiv">
-            <nav>
-                <a href="{{ url_for('index') }}"> Home</a> ||
-                <a href="{{ url_for('get_notes') }}"> My Meetings</a> ||
-                <a href="{{ url_for('new_note') }}">Add Meeting</a>
-            </nav>
-
-        {% if user %}
-            <nav>
-                <a href="{{url_for('logout') }}">Logout</a>
-            </nav>
-        {% else %}
-            <nav>
-                <a href="{{url_for('login') }}">Sign In</a> 
-                <a href="{{url_for('register') }}">Register</a>
-            </nav>
-        {% endif %}
-        </div>
-
-        <h1>Welcome {% if user %}{{user}}{% endif %}to UNC Meet!</h1>
-
-        <h2>***We need you to login with your credentials here***</h2>
+        <nav>
+            <a href="{{url_for('login') }}">Sign In</a>
+            <a href="{{url_for('register') }}">Register</a>
+        </nav>
+        <h1>Welcome to Group 2 Many Guys' UNCC Events App</h1>
         <div class="formwrapper">
             <h2 class="title">Login</h2>
             <form method="POST" action="/login">
@@ -52,6 +35,7 @@
                 </div>
                 {{ form.submit }}
             </form>
+            <a href="{{ url_for('register') }}">Register here</a>
         </div>
     </body>
 </html>
