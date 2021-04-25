@@ -8,15 +8,17 @@ class Event(db.Model):
     event_description = db.Column("event_text", db.String(100))
     event_date = db.Column("event_date", db.String(50))
     event_creator = db.Column("event_creator", db.String(100))
+    date_created = db.Column("date_created", db.String(50))
     # can create a foreign key; referencing the id variable in the User class
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     comments = db.relationship("Comment", backref="event", cascade="all, delete-orphan", lazy=True)
     
-    def __init__(self, title, description, date, creator, user_id):
+    def __init__(self, title, description, date, creator, user_id, date_created):
         self.event_title = title
         self.event_description = description
         self.event_date = date
         self.event_creator = creator
+        self.date_create = date_created
         self.user_id = user_id
 
 
@@ -24,6 +26,7 @@ class User(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)
     first_name = db.Column("first_name", db.String(100))
     last_name = db.Column("last_name", db.String(100))
+    full_name = db.Column("full_name", db.String(200))
     email = db.Column("email", db.String(100))
     password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
@@ -33,6 +36,7 @@ class User(db.Model):
     def __init__(self, first_name, last_name, email, password):
         self.first_name = first_name
         self.last_name = last_name
+        self.full_name = first_name + " " + last_name
         self.email = email
         self.password = password
         self.registered_on = datetime.date.today()

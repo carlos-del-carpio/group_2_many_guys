@@ -47,24 +47,31 @@ def get_events():
     # # retrieve user from database
     # check if a user is saved in session
     if session.get('user'):
+        other_events = db.session.query(Event).filter(Event.user_id != session['user_id']).all()
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
-        return render_template('my_events.html', events=my_events, user=session['user'])
+        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'])
     else:
         return redirect(url_for('login'))
 
 
 @app.route('/events/<event_id>')
-def get_event(event_id):
+def get_event(event_id, type):
+    print('called')
     if session.get('user'):
-        # retrieve note from database
-        my_event = db.session.query(Event).filter_by(id=event_id, user_id=session['user_id']).one()
-
-        # create a comment form object
-        form = CommentForm()
+        if type == "user":
+            print('here')
+            # retrieve note from database
+            my_event = db.session.query(Event).filter_by(id=event_id, user_id=session['user']).one()
+            # create a comment form object
+            form = CommentForm()
+        # elif type == "other":
+        #     print('or here')
+        #     my_event = db.session.query(Event).filter(Event.user_id != session['user']).all()
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:
+        print('lastly here')
         return redirect(url_for('login'))
 
 
@@ -78,12 +85,12 @@ def new_event():
             # get note data
             text = request.form['eventText']
             # create data stamp
+            event_date = formatDate(request.form['eventDate'])
             from datetime import date
             today = date.today()
             # format date
             today = today.strftime("%m-%d-%Y")
-            # TODO: Get name of user creator
-            new_record = Event(title, text, today, session['user_name'], session['user_id'])
+            new_record = Event(title, text, event_date, session['user_name'], session['user_id'], today)
             db.session.add(new_record)
             db.session.commit()
 
@@ -219,6 +226,11 @@ def new_comment(event_id):
 
     else:
         return redirect(url_for('login'))
+
+
+#formats and returns date correctly
+def formatDate(date):
+    return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
