@@ -21,16 +21,38 @@
 
         <h1>Welcome {{user}} to Group 2 Many Guys' UNCC Events App!</h1>
 
-        <h1>Events Listed Below...</h1>
-
+        <h2>Checkout These Events</h2>
         <table>
             <tr>
                 <th>Title</th>
-                <th>Date</th>
+                <th>Event Date</th>
+                <th>Event Creator</th>
+                <th>Event Description</th>
+            </tr>
+            {% for other_event in other_events %}
+            <tr>
+                <td><a href="{{ url_for('get_event', event_id=other_event.id, event_type='other') }}">{{other_event.event_title}}</a></td>
+                <td>{{ other_event.event_date }}</td>
+                <td>{{ other_event.event_creator }}</td>
+                <td>{{ other_event.event_description }}</td>
+                <td>
+                    <form>
+                        <input type="submit" value="RSVP">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>My Events</h2>
+        <table>
+            <tr>
+                <th>Title</th>
+                <th>Event Date</th>
             </tr>
             {% for event in events %}
             <tr>
-                <td><a href="{{ url_for('get_event', event_id=event.id) }}">{{event.event_title}}</a></td>
+                <td><a href="{{ url_for('get_event', event_id=event.id, event_type='user') }}">{{event.event_title}}</a></td>
                 <td>{{ event.event_date }}</td>
                 <td><a href="{{ url_for('update_event', event_id=event.id) }}">Edit</a></td>
                 <td>

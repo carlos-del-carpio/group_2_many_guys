@@ -47,21 +47,25 @@ def get_events():
     # # retrieve user from database
     # check if a user is saved in session
     if session.get('user'):
+        other_events = db.session.query(Event).filter(Event.user_id != session['user_id']).all()
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
-        return render_template('my_events.html', events=my_events, user=session['user'])
+        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'])
     else:
         return redirect(url_for('login'))
 
 
-@app.route('/events/<event_id>')
-def get_event(event_id):
+@app.route('/events/<event_id>/<event_type>')
+def get_event(event_id, event_type):
     if session.get('user'):
-        # retrieve note from database
-        my_event = db.session.query(Event).filter_by(id=event_id, user_id=session['user_id']).one()
-
         # create a comment form object
         form = CommentForm()
+
+        if event_type == "user":
+            # retrieve note from database
+            my_event = db.session.query(Event).filter_by(id=event_id).one()
+        elif event_type == "other":
+            my_event = db.session.query(Event).filter(Event.user_id != session['user_id']).one()
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:
@@ -71,19 +75,18 @@ def get_event(event_id):
 @app.route('/events/new_event', methods=['GET', 'POST'])
 def new_event():
     if session.get('user'):
-
         if request.method == 'POST':
             # get title data
             title = request.form['title']
             # get note data
             text = request.form['eventText']
             # create data stamp
+            event_date = formatDate(request.form['eventDate'])
             from datetime import date
             today = date.today()
             # format date
             today = today.strftime("%m-%d-%Y")
-            # TODO: Get name of user creator
-            new_record = Event(title, text, today, session['user_name'], session['user_id'])
+            new_record = Event(title, text, event_date, session['user_name'], session['user_id'], today)
             db.session.add(new_record)
             db.session.commit()
 
