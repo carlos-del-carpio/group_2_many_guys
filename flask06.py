@@ -64,21 +64,17 @@ def get_event(event_id, event_type):
         if event_type == "user":
             # retrieve note from database
             my_event = db.session.query(Event).filter_by(id=event_id).one()
-            print(my_event)
         elif event_type == "other":
             my_event = db.session.query(Event).filter(Event.user_id != session['user_id']).one()
-            print(my_event)
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:
-        print('lastly here')
         return redirect(url_for('login'))
 
 
 @app.route('/events/new_event', methods=['GET', 'POST'])
 def new_event():
     if session.get('user'):
-
         if request.method == 'POST':
             # get title data
             title = request.form['title']
@@ -226,11 +222,6 @@ def new_comment(event_id):
 
     else:
         return redirect(url_for('login'))
-
-
-#formats and returns date correctly
-def formatDate(date):
-    return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
