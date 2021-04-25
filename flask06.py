@@ -55,19 +55,19 @@ def get_events():
         return redirect(url_for('login'))
 
 
-@app.route('/events/<event_id>')
-def get_event(event_id, type):
-    print('called')
+@app.route('/events/<event_id>/<event_type>')
+def get_event(event_id, event_type):
     if session.get('user'):
-        if type == "user":
-            print('here')
+        # create a comment form object
+        form = CommentForm()
+
+        if event_type == "user":
             # retrieve note from database
-            my_event = db.session.query(Event).filter_by(id=event_id, user_id=session['user']).one()
-            # create a comment form object
-            form = CommentForm()
-        # elif type == "other":
-        #     print('or here')
-        #     my_event = db.session.query(Event).filter(Event.user_id != session['user']).all()
+            my_event = db.session.query(Event).filter_by(id=event_id).one()
+            print(my_event)
+        elif event_type == "other":
+            my_event = db.session.query(Event).filter(Event.user_id != session['user_id']).one()
+            print(my_event)
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:
