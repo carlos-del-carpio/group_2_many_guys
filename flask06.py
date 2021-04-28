@@ -224,6 +224,10 @@ def new_comment(event_id):
         return redirect(url_for('login'))
 
 
+def formatDate(date):
+    return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
+
+
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
 # To see the web page in your web browser, go to the url,
 #   http://127.0.0.1:5000
