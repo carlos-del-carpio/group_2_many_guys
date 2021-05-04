@@ -42,13 +42,25 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/events')
+@app.route('/events',methods=['GET', 'POST'])
 def get_events():
     # # retrieve user from database
     # check if a user is saved in session
     if session.get('user'):
         other_events = db.session.query(Event).filter(Event.user_id != session['user_id']).all()
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
+
+        if request.method == "POST":
+            if request.form.get("Sort_by_Name"):
+                print("Sorting by Name...")
+                other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
+
+            elif request.form.get("Sort_by_Date"):
+                print("Sorting by Date...")
+                other_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
+
+        elif request.method == "GET":
+            print("This shouldn't appear")
 
         return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'])
     else:
@@ -223,6 +235,8 @@ def new_comment(event_id):
     else:
         return redirect(url_for('login'))
 
+def formatDate(date): 
+    return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
 # To see the web page in your web browser, go to the url,
