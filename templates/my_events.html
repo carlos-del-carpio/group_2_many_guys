@@ -24,7 +24,10 @@
         <h2>Checkout These Events</h2>
         <table>
             <tr>
-                <th>Title</th>
+                <form method ="post" action="/events">
+                    <button type="get_events" name="Sort_by_Name" value="Sort_by_Name"> Sort by Name </button>
+                    <button type="get_events" name="Sort_by_Date" value="Sort_by_Date"> Sort by Date </button>
+                </form> 
                 <th>Event Date</th>
                 <th>Event Creator</th>
                 <th>Event Description</th>
