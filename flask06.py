@@ -10,6 +10,7 @@ from models import Event as Event
 from models import User as User
 from models import Comment as Comment
 from forms import RegisterForm, LoginForm, CommentForm
+from flask_fontawesome import FontAwesome
 import bcrypt
 
 
@@ -23,6 +24,7 @@ app.config['SECRET_KEY'] = 'SE3155'
 
 # Bind SQLAlchemy db object to this Flask app
 db.init_app(app)
+fa = FontAwesome(app)
 
 
 # Setup models
@@ -69,7 +71,6 @@ def get_events():
 
 @app.route('/events/<event_id>/<event_type>')
 def get_event(event_id, event_type):
-    print(event_type)
     if session.get('user'):
         # create a comment form object
         form = CommentForm()
@@ -235,6 +236,7 @@ def new_comment(event_id):
 
     else:
         return redirect(url_for('login'))
+
 
 def formatDate(date): 
     return date[5:7] + '-' + date[8:10] + '-' + date[0:4]

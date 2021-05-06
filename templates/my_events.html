@@ -6,6 +6,7 @@
         <meta name="description" content="UNCC Events App">
         <title>UNCC Events App - View your Events</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+        {{ fontawesome_html() }}
     </head>
     <body>
 
@@ -31,6 +32,7 @@
                 <th>Event Date</th>
                 <th>Event Creator</th>
                 <th>Event Description</th>
+                <th></th>
             </tr>
             {% for other_event in other_events %}
             <tr>
@@ -38,6 +40,13 @@
                 <td>{{ other_event.event_date }}</td>
                 <td>{{ other_event.event_creator }}</td>
                 <td>{{ other_event.event_description }}</td>
+                <td>
+                    <form>
+                        <button>Like</button>
+                        Count = 14
+                        <button>Dislike</button>
+                    </form>
+                </td>
                 <td>
                     <form>
                         <input type="submit" value="RSVP">
