@@ -69,6 +69,7 @@ def get_events():
 
 @app.route('/events/<event_id>/<event_type>')
 def get_event(event_id, event_type):
+    print(event_type)
     if session.get('user'):
         # create a comment form object
         form = CommentForm()
@@ -77,7 +78,7 @@ def get_event(event_id, event_type):
             # retrieve note from database
             my_event = db.session.query(Event).filter_by(id=event_id).one()
         elif event_type == "other":
-            my_event = db.session.query(Event).filter(Event.user_id != session['user_id']).one()
+            my_event = db.session.query(Event).filter(Event.id == event_id)
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:
@@ -236,9 +237,6 @@ def new_comment(event_id):
         return redirect(url_for('login'))
 
 def formatDate(date): 
-    return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
-
-def formatDate(date):
     return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
 
