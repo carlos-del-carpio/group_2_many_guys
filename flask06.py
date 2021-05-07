@@ -42,7 +42,7 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/events',methods=['GET', 'POST'])
+@app.route('/events', methods=['GET', 'POST'])
 def get_events():
     # # retrieve user from database
     # check if a user is saved in session
@@ -51,29 +51,61 @@ def get_events():
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
         if request.method == "POST":
-            if request.form.get("Sort_by_Name"):
+            print("POST")
+            if request.form.get("Sort_by_Names"):
                 other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
 
             elif request.form.get("Sort_by_Date"):
                 other_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
+            elif request.form.get("like"):
+                like_toggle(request.form.get("like"))
+            elif request.form.get("dislike"):
+                dislike_toggle(request.form.get("dislike"))
 
         elif request.method == "GET":
             print("This shouldn't appear")
 
-        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'])
+        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
     else:
         return redirect(url_for('login'))
 
 
-def get_like_count():
-    print("like called")
-    # like_count = 0
-    #
-    # for i in like:
-    #     if i == '|':
-    #         like_count += 1
-    #
-    # return like_count - 1
+def like_toggle(event_id):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+    print("Event like = ", event.like)
+    if str(session['user_id']) in event.like:
+        replaced_string = event.like.replace('|' + str(session['user_id']) + '|', '|')
+        event.like = replaced_string
+        db.session.commit()
+        increment_like_counter(event_id, 'sub')
+    else:
+        event.like += str(session['user_id']) + "|"
+        db.session.commit()
+        increment_like_counter(event_id, 'add')
+
+
+def dislike_toggle(event_id):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+    if str(session['user_id']) in event.dislike:
+        replaced_string = event.dislike.replace('|' + str(session['user_id']) + '|', '|')
+        event.dislike = replaced_string
+        db.session.commit()
+        increment_like_counter(event_id, 'add')
+    else:
+        event.dislike += str(session['user_id']) + "|"
+        db.session.commit()
+        increment_like_counter(event_id, 'sub')
+
+
+def increment_like_counter(event_id, action):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+
+    if action == 'add':
+        event.count += 1
+    elif action == 'sub':
+        event.count -= 1
+
+    db.session.commit()
 
 
 @app.route('/events/<event_id>/<event_type>')

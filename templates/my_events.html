@@ -40,10 +40,20 @@
                 <td>{{ other_event.event_creator }}</td>
                 <td>{{ other_event.event_description }}</td>
                 <td>
-                    <form>
-                        <button type="get_like_count">Like</button>
+                    <form method="post" action="/events">
+                        {% if '|' ~ user_id ~ '|' in other_event.like %}
+                        <button name="like" value="{{ other_event.id }}">Liked</button>
+                        {% else %}
+                        <button name="like" value="{{ other_event.id }}">Like</button>
+                        {% endif %}
+
                         Count = {{ other_event.count }}
-                        <button>Dislike</button>
+
+                        {% if '|' ~ user_id ~ '|' in other_event.dislike %}
+                        <button name="dislike" value="{{ other_event.id }}">Disliked</button>
+                        {% else %}
+                        <button name="dislike" value="{{ other_event.id }}">Dislike</button>
+                        {% endif %}
                     </form>
                 </td>
                 <td>

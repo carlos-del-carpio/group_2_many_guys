@@ -21,7 +21,7 @@ class Event(db.Model):
         self.event_description = description
         self.event_date = date
         self.event_creator = creator
-        self.date_created= date_created
+        self.date_created = date_created
         self.user_id = user_id
         self.like = "|"
         self.dislike = "|"
