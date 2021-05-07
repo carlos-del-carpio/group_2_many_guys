@@ -12,14 +12,20 @@ class Event(db.Model):
     # can create a foreign key; referencing the id variable in the User class
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     comments = db.relationship("Comment", backref="event", cascade="all, delete-orphan", lazy=True)
+    like = db.Column("like", db.String(200))
+    dislike = db.Column("dislike", db.String(200))
+    count = db.Column("count", db.Integer)
     
     def __init__(self, title, description, date, creator, user_id, date_created):
         self.event_title = title
         self.event_description = description
         self.event_date = date
         self.event_creator = creator
-        self.date_create = date_created
+        self.date_created= date_created
         self.user_id = user_id
+        self.like = "|"
+        self.dislike = "|"
+        self.count = 0
 
 
 class User(db.Model):

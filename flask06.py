@@ -10,7 +10,6 @@ from models import Event as Event
 from models import User as User
 from models import Comment as Comment
 from forms import RegisterForm, LoginForm, CommentForm
-from flask_fontawesome import FontAwesome
 import bcrypt
 
 
@@ -24,7 +23,6 @@ app.config['SECRET_KEY'] = 'SE3155'
 
 # Bind SQLAlchemy db object to this Flask app
 db.init_app(app)
-fa = FontAwesome(app)
 
 
 # Setup models
@@ -54,11 +52,9 @@ def get_events():
 
         if request.method == "POST":
             if request.form.get("Sort_by_Name"):
-                print("Sorting by Name...")
                 other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
 
             elif request.form.get("Sort_by_Date"):
-                print("Sorting by Date...")
                 other_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
 
         elif request.method == "GET":
@@ -67,6 +63,17 @@ def get_events():
         return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'])
     else:
         return redirect(url_for('login'))
+
+
+def get_like_count():
+    print("like called")
+    # like_count = 0
+    #
+    # for i in like:
+    #     if i == '|':
+    #         like_count += 1
+    #
+    # return like_count - 1
 
 
 @app.route('/events/<event_id>/<event_type>')
@@ -141,8 +148,6 @@ def update_event(event_id):
     else:
         # user is not in session redirect to login
         return redirect(url_for('login'))
-
-    return render_template('new_event.html', event=my_event, user=a_user)
 
 
 @app.route('/events.delete/<event_id>', methods=['POST'])

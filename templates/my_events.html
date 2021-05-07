@@ -6,7 +6,6 @@
         <meta name="description" content="UNCC Events App">
         <title>UNCC Events App - View your Events</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-        {{ fontawesome_html() }}
     </head>
     <body>
 
@@ -42,8 +41,8 @@
                 <td>{{ other_event.event_description }}</td>
                 <td>
                     <form>
-                        <button>Like</button>
-                        Count = 14
+                        <button type="get_like_count">Like</button>
+                        Count = {{ other_event.count }}
                         <button>Dislike</button>
                     </form>
                 </td>
@@ -61,11 +60,13 @@
             <tr>
                 <th>Title</th>
                 <th>Event Date</th>
+                <th>Event Rating</th>
             </tr>
             {% for event in events %}
             <tr>
                 <td><a href="{{ url_for('get_event', event_id=event.id, event_type='user') }}">{{event.event_title}}</a></td>
                 <td>{{ event.event_date }}</td>
+                <td>{{ event.count }} Likes</td>
                 <td><a href="{{ url_for('update_event', event_id=event.id) }}">Edit</a></td>
                 <td>
                     <form action="{{ url_for('delete_event', event_id=event.id) }}" method="post">
