@@ -51,7 +51,6 @@ def get_events():
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
         if request.method == "POST":
-            print("POST")
             if request.form.get("Sort_by_Names"):
                 other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
 
@@ -72,29 +71,42 @@ def get_events():
 
 def like_toggle(event_id):
     event = db.session.query(Event).filter(Event.id == event_id).one()
-    print("Event like = ", event.like)
-    if str(session['user_id']) in event.like:
-        replaced_string = event.like.replace('|' + str(session['user_id']) + '|', '|')
+    user_string = '|' + str(session['user_id']) + '|'
+
+    # removing user from like
+    if user_string in event.like:
+        replaced_string = event.like.replace(user_string, '|')
         event.like = replaced_string
         db.session.commit()
         increment_like_counter(event_id, 'sub')
+    # adding user to like
     else:
         event.like += str(session['user_id']) + "|"
         db.session.commit()
         increment_like_counter(event_id, 'add')
 
+        if user_string in event.dislike:
+            dislike_toggle(event_id)
+
 
 def dislike_toggle(event_id):
     event = db.session.query(Event).filter(Event.id == event_id).one()
-    if str(session['user_id']) in event.dislike:
-        replaced_string = event.dislike.replace('|' + str(session['user_id']) + '|', '|')
+    user_string = '|' + str(session['user_id']) + '|'
+
+    # removing user from dislike
+    if user_string in event.dislike:
+        replaced_string = event.dislike.replace(user_string, '|')
         event.dislike = replaced_string
         db.session.commit()
         increment_like_counter(event_id, 'add')
+    # adding user to dislike
     else:
-        event.dislike += str(session['user_id']) + "|"
+        dislike = event.dislike + str(session['user_id']) + "|"
+        event.dislike = dislike
         db.session.commit()
         increment_like_counter(event_id, 'sub')
+        if user_string in event.like:
+            like_toggle(event_id)
 
 
 def increment_like_counter(event_id, action):
@@ -259,6 +271,7 @@ def logout():
 
 @app.route('/events/<event_id>/comment', methods=['POST'])
 def new_comment(event_id):
+    print("event_id = ", event_id)
     if session.get('user'):
         comment_form = CommentForm()
         # validate_on_submit only validates using POST
@@ -269,7 +282,7 @@ def new_comment(event_id):
             db.session.add(new_record)
             db.session.commit()
 
-        return redirect(url_for('get_event', event_id=event_id))
+        return redirect(url_for('get_event', event_id=event_id, event_type='user'))
 
     else:
         return redirect(url_for('login'))
