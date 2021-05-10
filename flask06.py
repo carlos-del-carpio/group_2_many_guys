@@ -60,6 +60,8 @@ def get_events():
                 like_toggle(request.form.get("like"))
             elif request.form.get("dislike"):
                 dislike_toggle(request.form.get("dislike"))
+            elif request.form.get("rsvp"):
+                rsvp_toggle(request.form.get("rsvp"))
 
         elif request.method == "GET":
             print("This shouldn't appear")
@@ -107,6 +109,22 @@ def dislike_toggle(event_id):
         increment_like_counter(event_id, 'sub')
         if user_string in event.like:
             like_toggle(event_id)
+
+
+#RSVP TOGGLE
+def rsvp_toggle(event_id):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+    user_string = '|' + str(session['user_id']) + '|'
+
+    if user_string in event.rsvp:
+        replaced_string = event.rsvp.replace(user_string, '|')
+        event.rsvp = replaced_string
+        db.session.commit()
+
+    else:
+        rsvp = event.rsvp + str(session['user_id']) + "|"
+        event.rsvp = rsvp
+        db.session.commit()
 
 
 def increment_like_counter(event_id, action):

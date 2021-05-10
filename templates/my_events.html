@@ -41,6 +41,8 @@
                 <td>{{ other_event.event_description }}</td>
                 <td>
                     <form method="post" action="/events">
+
+
                         {% if '|' ~ user_id ~ '|' in other_event.like %}
                         <button name="like" value="{{ other_event.id }}">Liked</button>
                         {% else %}
@@ -54,11 +56,17 @@
                         {% else %}
                         <button name="dislike" value="{{ other_event.id }}">Dislike</button>
                         {% endif %}
+
+                        {% if '|' ~ user_id ~ '|' in other_event.rsvp %}
+                        <button name="rsvp" value="{{ other_event.id }}">RSVP</button>
+                        {% else %}
+                        <button name="rsvp" value="{{ other_event.id }}">UNDO RSVP</button>
+                        {% endif %}
+
                     </form>
                 </td>
                 <td>
-                    <form>
-                        <input type="submit" value="RSVP">
+                    <form method="post" action="/events">
                     </form>
                 </td>
             </tr>

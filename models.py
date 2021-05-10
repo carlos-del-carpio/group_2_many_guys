@@ -14,6 +14,7 @@ class Event(db.Model):
     comments = db.relationship("Comment", backref="event", cascade="all, delete-orphan", lazy=True)
     like = db.Column("like", db.String(200))
     dislike = db.Column("dislike", db.String(200))
+    rsvp = db.Column("rsvp", db.String(200))
     count = db.Column("count", db.Integer)
     
     def __init__(self, title, description, date, creator, user_id, date_created):
@@ -25,6 +26,7 @@ class Event(db.Model):
         self.user_id = user_id
         self.like = "|"
         self.dislike = "|"
+        self.rsvp = "|"
         self.count = 0
 
 
