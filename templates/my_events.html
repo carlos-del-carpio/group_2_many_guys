@@ -27,10 +27,15 @@
                 <form method ="post" action="/events">
                     <button type="get_events" name="Sort_by_Name" value="Sort_by_Name"> Sort by Name </button>
                     <button type="get_events" name="Sort_by_Date" value="Sort_by_Date"> Sort by Date </button>
+<<<<<<< HEAD
                 </form> 
+=======
+                </form>
+>>>>>>> be9c956ecdd51ad420f780e8d231211c8710a01d
                 <th>Event Date</th>
                 <th>Event Creator</th>
                 <th>Event Description</th>
+                <th></th>
             </tr>
             {% for other_event in other_events %}
             <tr>
@@ -39,8 +44,33 @@
                 <td>{{ other_event.event_creator }}</td>
                 <td>{{ other_event.event_description }}</td>
                 <td>
-                    <form>
-                        <input type="submit" value="RSVP">
+                    <form method="post" action="/events">
+
+
+                        {% if '|' ~ user_id ~ '|' in other_event.like %}
+                        <button name="like" value="{{ other_event.id }}">Liked</button>
+                        {% else %}
+                        <button name="like" value="{{ other_event.id }}">Like</button>
+                        {% endif %}
+
+                        {{ other_event.count }}
+
+                        {% if '|' ~ user_id ~ '|' in other_event.dislike %}
+                        <button name="dislike" value="{{ other_event.id }}">Disliked</button>
+                        {% else %}
+                        <button name="dislike" value="{{ other_event.id }}">Dislike</button>
+                        {% endif %}
+
+                        {% if '|' ~ user_id ~ '|' in other_event.rsvp %}
+                        <button name="rsvp" value="{{ other_event.id }}">RSVP</button>
+                        {% else %}
+                        <button name="rsvp" value="{{ other_event.id }}">UNDO RSVP</button>
+                        {% endif %}
+
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="/events">
                     </form>
                 </td>
             </tr>
@@ -52,11 +82,13 @@
             <tr>
                 <th>Title</th>
                 <th>Event Date</th>
+                <th>Event Rating</th>
             </tr>
             {% for event in events %}
             <tr>
                 <td><a href="{{ url_for('get_event', event_id=event.id, event_type='user') }}">{{event.event_title}}</a></td>
                 <td>{{ event.event_date }}</td>
+                <td>{{ event.count }} Like(s)</td>
                 <td><a href="{{ url_for('update_event', event_id=event.id) }}">Edit</a></td>
                 <td>
                     <form action="{{ url_for('delete_event', event_id=event.id) }}" method="post">

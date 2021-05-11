@@ -42,7 +42,7 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/events',methods=['GET', 'POST'])
+@app.route('/events', methods=['GET', 'POST'])
 def get_events():
     # # retrieve user from database
     # check if a user is saved in session
@@ -51,20 +51,91 @@ def get_events():
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
         if request.method == "POST":
-            if request.form.get("Sort_by_Name"):
-                print("Sorting by Name...")
+            if request.form.get("Sort_by_Names"):
                 other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
 
             elif request.form.get("Sort_by_Date"):
-                print("Sorting by Date...")
                 other_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
+            elif request.form.get("like"):
+                like_toggle(request.form.get("like"))
+            elif request.form.get("dislike"):
+                dislike_toggle(request.form.get("dislike"))
+            elif request.form.get("rsvp"):
+                rsvp_toggle(request.form.get("rsvp"))
 
         elif request.method == "GET":
             print("This shouldn't appear")
 
-        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'])
+        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
     else:
         return redirect(url_for('login'))
+
+
+def like_toggle(event_id):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+    user_string = '|' + str(session['user_id']) + '|'
+
+    # removing user from like
+    if user_string in event.like:
+        replaced_string = event.like.replace(user_string, '|')
+        event.like = replaced_string
+        db.session.commit()
+        increment_like_counter(event_id, 'sub')
+    # adding user to like
+    else:
+        event.like += str(session['user_id']) + "|"
+        db.session.commit()
+        increment_like_counter(event_id, 'add')
+
+        if user_string in event.dislike:
+            dislike_toggle(event_id)
+
+
+def dislike_toggle(event_id):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+    user_string = '|' + str(session['user_id']) + '|'
+
+    # removing user from dislike
+    if user_string in event.dislike:
+        replaced_string = event.dislike.replace(user_string, '|')
+        event.dislike = replaced_string
+        db.session.commit()
+        increment_like_counter(event_id, 'add')
+    # adding user to dislike
+    else:
+        dislike = event.dislike + str(session['user_id']) + "|"
+        event.dislike = dislike
+        db.session.commit()
+        increment_like_counter(event_id, 'sub')
+        if user_string in event.like:
+            like_toggle(event_id)
+
+
+#RSVP TOGGLE
+def rsvp_toggle(event_id):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+    user_string = '|' + str(session['user_id']) + '|'
+
+    if user_string in event.rsvp:
+        replaced_string = event.rsvp.replace(user_string, '|')
+        event.rsvp = replaced_string
+        db.session.commit()
+
+    else:
+        rsvp = event.rsvp + str(session['user_id']) + "|"
+        event.rsvp = rsvp
+        db.session.commit()
+
+
+def increment_like_counter(event_id, action):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+
+    if action == 'add':
+        event.count += 1
+    elif action == 'sub':
+        event.count -= 1
+
+    db.session.commit()
 
 
 @app.route('/events/<event_id>/<event_type>')
@@ -77,7 +148,7 @@ def get_event(event_id, event_type):
             # retrieve note from database
             my_event = db.session.query(Event).filter_by(id=event_id).one()
         elif event_type == "other":
-            my_event = db.session.query(Event).filter(Event.user_id != session['user_id']).one()
+            my_event = db.session.query(Event).filter(Event.id == event_id)
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:
@@ -139,8 +210,6 @@ def update_event(event_id):
     else:
         # user is not in session redirect to login
         return redirect(url_for('login'))
-
-    return render_template('new_event.html', event=my_event, user=a_user)
 
 
 @app.route('/events.delete/<event_id>', methods=['POST'])
@@ -220,6 +289,7 @@ def logout():
 
 @app.route('/events/<event_id>/comment', methods=['POST'])
 def new_comment(event_id):
+    print("event_id = ", event_id)
     if session.get('user'):
         comment_form = CommentForm()
         # validate_on_submit only validates using POST
@@ -230,15 +300,13 @@ def new_comment(event_id):
             db.session.add(new_record)
             db.session.commit()
 
-        return redirect(url_for('get_event', event_id=event_id))
+        return redirect(url_for('get_event', event_id=event_id, event_type='user'))
 
     else:
         return redirect(url_for('login'))
 
-def formatDate(date): 
-    return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
-def formatDate(date):
+def formatDate(date): 
     return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
 

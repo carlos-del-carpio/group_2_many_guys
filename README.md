@@ -5,3 +5,4 @@ Required Libraries
     bcrypt
     SQLAlchemy
     FlaskForm
+    FontAwsome 0.1.5
