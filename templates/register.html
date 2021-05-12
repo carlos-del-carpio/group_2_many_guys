@@ -5,88 +5,40 @@
     <title>Title</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='forms.css') }}">
+        <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" rel="stylesheet">
 </head>
     <body>
-        <div class="navdiv">
-        {% if user %}
-            <nav>
-                <a href="{{url_for('logout') }}">Logout</a>
-            </nav>
-        {% else %}
-            <nav style="text-align: left;">
-                <a href="{{url_for('login') }}">Sign In</a> 
-                <a href="{{url_for('register') }}">Register</a>
-            </nav>
-        {% endif %}
-        
-        </div>
-        <h1>Welcome to Meet Central</h1>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{url_for('get_events') }}">Meet Central</a>
+                <button class="navbar-toggler" data-target="#navbarResponsive" data-toggle="collapse" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        {% if user %}
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{url_for('logout') }}">Logout</a>
+                        </li>
+                        {% else %}
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{url_for('login') }}">Sign In</a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link"  href="{{url_for('register') }}">Register</a>
+                        </li>
+                        {% endif %}
 
-        <div class="formwrapper">
-            <h2 class="title">Register</h2>
-            <form method="POST" action="/register">
-                <div class="form-field">{{ form.firstname.label }} {{ form.firstname }}
-                    {% if form.firstname.errors %}
-                    <ul class="errors">
-                        {% for error in form.firstname.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
                     </ul>
-                    {% endif %}
                 </div>
-                <div class="form-field">{{ form.lastname.label }} {{ form.lastname }}
-                    {% if form.lastname.errors %}
-                    <ul class="errors">
-                        {% for error in form.lastname.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                <div class="form-field">{{ form.email.label }} {{ form.email }}
-                    {% if form.email.errors %}
-                    <ul class="errors">
-                        {% for error in form.email.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                <div class="form-field">{{ form.password.label }} {{ form.password }}
-                    {% if form.password.errors %}
-                    <ul class="errors">
-                        {% for error in form.password.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                <div class="form-field">{{ form.confirmPassword.label }} {{ form.confirmPassword }}
-                    {% if form.confirmPassword.errors %}
-                    <ul class="errors">
-                        {% for error in form.confirmPassword.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                {{ form.submit }}
-            </form>
-        </div>
-        
-        <h1 style="text-align: center;">Welcome {% if user %}{{user}}{% endif %}to Group 2 Many Guys' UNCC Events App!</h1>
-        
-        <h1 style="text-align: center;">Welcome {% if user %}{{user}}{% endif %}to Group 2 Many Guys' UNCC Events App!</h1>
+            </div>
+        </nav>
+        <h1 style="text-align: center;">Welcome to Meet Central</h1>
 
-        <h2 style="text-align: center;">Make your account by filling in the fields below \/</h2>
-
-        <div class="container"> 
+        <div class="container">
             <div class="formwrapper">
-
                 <h2 class="title">Register</h2>
-
                 <form method="POST" action="/register">
-
                     <div class="form-field">{{ form.firstname.label }} {{ form.firstname }}
                         {% if form.firstname.errors %}
                         <ul class="errors">
@@ -96,7 +48,6 @@
                         </ul>
                         {% endif %}
                     </div>
-
                     <div class="form-field">{{ form.lastname.label }} {{ form.lastname }}
                         {% if form.lastname.errors %}
                         <ul class="errors">
@@ -106,7 +57,6 @@
                         </ul>
                         {% endif %}
                     </div>
-
                     <div class="form-field">{{ form.email.label }} {{ form.email }}
                         {% if form.email.errors %}
                         <ul class="errors">
@@ -116,7 +66,6 @@
                         </ul>
                         {% endif %}
                     </div>
-
                     <div class="form-field">{{ form.password.label }} {{ form.password }}
                         {% if form.password.errors %}
                         <ul class="errors">
@@ -126,7 +75,6 @@
                         </ul>
                         {% endif %}
                     </div>
-
                     <div class="form-field">{{ form.confirmPassword.label }} {{ form.confirmPassword }}
                         {% if form.confirmPassword.errors %}
                         <ul class="errors">
@@ -136,12 +84,9 @@
                         </ul>
                         {% endif %}
                     </div>
-
                     {{ form.submit }}
-
                 </form>
-
             </div>
-        </div>    
+        </div>
     </body>
 </html>

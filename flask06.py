@@ -26,17 +26,6 @@ with app.app_context():
     db.create_all()  # run under the app context
 
 
-# @app.route is a decorator. It gives the function "index" special powers.
-# In this case it makes it so anyone going to "your-url/" makes this function
-# get called. What it returns is what is shown as the web page
-@app.route('/index')
-def index():
-    # check if a user is saved in session
-    if session.get('user'):
-        return render_template("index.html", user=session['user'])
-    return render_template("index.html")
-
-
 @app.route('/events', methods=['GET', 'POST'])
 def get_events():
     # retrieve user from database, check if a user is saved in session
