@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Meet Central App">
+        <title>Meet Central</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    </head>
+    <body>
+        <nav>
+            <a href="{{ url_for('get_events') }}">Events</a> ||
+            <a href="{{ url_for('get_my_events') }}">My Events</a> ||
+            <a href="{{ url_for('get_rsvp_events')}}">My RSVPed Events</a> ||
+            <a href="{{ url_for('get_events') }}">RSVPed</a>
+        </nav>
+
+        <nav>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+
+        <h1>RSVPed Events</h1>
+        <h2>{{ user }}'s RSVPs</h2>
+
+        <form method ="post" action="/rsvp", style="padding: 0 0 1em 0">
+            <button type="get_rsvp_events" name="Sort_mine_by_Name" value="Sort_mine_by_Name"> Sort by Name </button>
+            <button type="get_rsvp_events" name="Sort_mine_by_Date" value="Sort_mine_by_Date"> Sort by Date </button>
+        </form>
+        <table style="width: 100%">
+            <colgroup>
+               <col span="1" style="width: 15%;">
+               <col span="1" style="width: 10%;">
+               <col span="1" style="width: 12%;">
+               <col span="1" style="width: 22%;">
+            </colgroup>
+            <tr>
+                <th style="text-align: left;">Event</th>
+                <th style="text-align: left;">Date</th>
+                <th style="text-align: left;">Creator</th>
+                <th style="text-align: left;">Description</th>
+                <th style="text-align: left;">Attending</th>
+            </tr>
+            {% for event in events %}
+            <tr>
+                <td><a href="{{ url_for('get_rsvp_events', event_id=event.id, event_type='other') }}">{{event.event_title}}</a></td>
+                <td>{{ event.event_date }}</td>
+                <td>{{ event.event_creator }}</td>
+                <td>{{ event.event_description }}</td>
+                <td>{{ event.rsvp_count }} attending</td>
+                <td>
+                    <form method="post" action="/rsvp">
+
+                        {% if '|' ~ user_id ~ '|' in event.like %}
+                        <button name="like" value="{{ event.id }}">Liked</button>
+                        {% else %}
+                        <button name="like" value="{{ event.id }}">Like</button>
+                        {% endif %}
+
+                        {{ event.like_count }}
+
+                        {% if '|' ~ user_id ~ '|' in event.dislike %}
+                        <button name="dislike" value="{{ event.id }}">Disliked</button>
+                        {% else %}
+                        <button name="dislike" value="{{ event.id }}">Dislike</button>
+                        {% endif %}
+
+                        {% if '|' ~ user_id ~ '|' in event.rsvp %}
+                        <button name="rsvp" value="{{ event.id }}">RSVPed</button>
+                        {% else %}
+                        <button name="rsvp" value="{{ event.id }}">RSVP</button>
+                        {% endif %}
+
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="/rsvp">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

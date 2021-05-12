@@ -5,21 +5,28 @@
         <meta content="width=device-width, initial-scale=1" name="viewport">
         <meta content="UNCC Notes App" name="description">
 
-        <title>UNCC Notes App - New Note</title>
+        <title>Meet Central</title>
         <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet">
     </head>
 
     <body>
         <nav>
-            <a href="{{url_for('index')}}"> Home</a> ||
-            <a href="{{url_for('get_events')}}"> My Meetings</a>
+            <a href="{{url_for('get_events')}}">Meet Central</a> ||
+            <a href="{{url_for('get_events')}}">My Events</a> ||
+            <a href="{{url_for('get_events')}}">RSVPed Events</a>
         </nav>
 
         <nav>
             <a href="{{ url_for('logout') }}">Logout</a>
         </nav>
 
-        <h1>Welcome {{user}} to Group 2 Many Guys' UNCC Events App!</h1>
+        <h1>{% if event %}
+                Update Event
+            {% else %}
+                Create a New Event
+            {% endif %}
+        </h1>
+        <h2>Tell us more about your event</h2>
 
         {% if event %}
         <form action="{{ url_for('update_event', event_id=event.id) }}" method="post">
@@ -27,13 +34,14 @@
         <form action="{{ url_for('new_event') }}" method="post">
             {% endif %}
             <p><label>Title </label></p>
-            <p><input name="title" type="text"/></p>
+            <p><input name="title" type="text" value="{% if event %}{{event.event_title}}{% endif %}"/></p>
+
 
             <p><label>Meeting Description</label></p>
             <p>
                   <textarea cols="0" name="eventText" rows="6">
                       {% if event %}
-                          {{event.text}}
+                          {{event.event_description}}
                       {% else %}
                           Add your meeting description here...
                       {% endif %}

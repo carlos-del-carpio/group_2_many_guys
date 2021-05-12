@@ -14,8 +14,9 @@ class Event(db.Model):
     comments = db.relationship("Comment", backref="event", cascade="all, delete-orphan", lazy=True)
     like = db.Column("like", db.String(200))
     dislike = db.Column("dislike", db.String(200))
+    like_count = db.Column("like_count", db.Integer)
     rsvp = db.Column("rsvp", db.String(200))
-    count = db.Column("count", db.Integer)
+    rsvp_count = db.Column("rsvp_count", db.Integer)
     
     def __init__(self, title, description, date, creator, user_id, date_created):
         self.event_title = title
@@ -27,7 +28,8 @@ class Event(db.Model):
         self.like = "|"
         self.dislike = "|"
         self.rsvp = "|"
-        self.count = 0
+        self.like_count = 0
+        self.rsvp_count = 0
 
 
 class User(db.Model):
@@ -40,6 +42,7 @@ class User(db.Model):
     registered_on = db.Column(db.DateTime, nullable=False)
     event = db.relationship("Event", backref="user", lazy=True)
     comments = db.relationship("Comment", backref="user", lazy=True)
+    rsvped_events = db.Column("rsvped_events", db.String(200))
 
     def __init__(self, first_name, last_name, email, password):
         self.first_name = first_name
@@ -48,6 +51,7 @@ class User(db.Model):
         self.email = email
         self.password = password
         self.registered_on = datetime.date.today()
+        self.rsvped_events = "|"
 
 
 class Comment(db.Model):

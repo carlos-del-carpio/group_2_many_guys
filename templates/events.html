@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Meet Central App">
+        <title>UNCC Events App - View your Events</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    </head>
+    <body>
+        <nav>
+            <a href="{{url_for('get_events')}}">Events</a> ||
+            <a href="{{url_for('get_my_events')}}">My Events</a> ||
+            <a href="{{url_for('get_rsvp_events')}}">My RSVPed Events</a> ||
+            <a href="{{ url_for('new_event') }}">Add an Event</a>
+        </nav>
+
+        <nav>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+
+        <h1>Explore Events</h1>
+
+        <h2>Checkout These Events</h2>
+        <form method ="post" action="/events", style="padding: 0 0 1em 0">
+            <button type="get_events" name="Sort_by_Name" value="Sort_by_Name"> Sort by Name </button>
+            <button type="get_events" name="Sort_by_Date" value="Sort_by_Date"> Sort by Date </button>
+        </form>
+
+        <table style="width: 100%">
+            <colgroup>
+               <col span="1" style="width: 15%;">
+               <col span="1" style="width: 10%;">
+               <col span="1" style="width: 12%;">
+               <col span="1" style="width: 22%;">
+            </colgroup>
+            <tr>
+                <th style="text-align: left;">Event</th>
+                <th style="text-align: left;">Date</th>
+                <th style="text-align: left;">Creator</th>
+                <th style="text-align: left;">Description</th>
+                <th style="text-align: left;">Attending</th>
+            </tr>
+            {% for other_event in other_events %}
+            <tr>
+                <td><a href="{{ url_for('get_event', event_id=other_event.id, event_type='other') }}">{{other_event.event_title}}</a></td>
+                <td>{{ other_event.event_date }}</td>
+                <td>{{ other_event.event_creator }}</td>
+                <td>{{ other_event.event_description }}</td>
+                <td>{{ other_event.rsvp_count }} attending</td>
+                <td>
+                    <form method="post" action="/events">
+
+                        {% if '|' ~ user_id ~ '|' in other_event.like %}
+                        <button name="like" value="{{ other_event.id }}">Liked</button>
+                        {% else %}
+                        <button name="like" value="{{ other_event.id }}">Like</button>
+                        {% endif %}
+
+                        {{ other_event.like_count }}
+
+                        {% if '|' ~ user_id ~ '|' in other_event.dislike %}
+                        <button name="dislike" value="{{ other_event.id }}">Disliked</button>
+                        {% else %}
+                        <button name="dislike" value="{{ other_event.id }}">Dislike</button>
+                        {% endif %}
+
+                        {% if '|' ~ user_id ~ '|' in other_event.rsvp %}
+                        <button name="rsvp" value="{{ other_event.id }}">RSVPed</button>
+                        {% else %}
+                        <button name="rsvp" value="{{ other_event.id }}">RSVP</button>
+                        {% endif %}
+
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="/events">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>My Events</h2>
+        <table style="width: 100%">
+            <colgroup>
+               <col span="1" style="width: 15%;">
+               <col span="1" style="width: 10%;">
+               <col span="1" style="width: 8%;">
+               <col span="1" style="width: 10%;">
+            </colgroup>
+            <tr>
+                <th style="text-align: left;">Title</th>
+                <th style="text-align: left;">Date</th>
+                <th style="text-align: left;">Rating</th>
+                <th style="text-align: left;">Attending</th>
+            </tr>
+            {% for event in events %}
+            <tr>
+                <td><a href="{{ url_for('get_event', event_id=event.id, event_type='user') }}">{{event.event_title}}</a></td>
+                <td>{{ event.event_date }}</td>
+                <td>{{ event.like_count }} Like(s)</td>
+                <td>{{ event.rsvp_count }} Attending</td>
+                <td><a href="{{ url_for('update_event', event_id=event.id) }}">Edit</a></td>
+                <td>
+                    <form action="{{ url_for('delete_event', event_id=event.id) }}" method="post">
+                        <input type="submit" value="Delete">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

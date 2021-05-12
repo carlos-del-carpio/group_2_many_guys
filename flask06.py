@@ -12,18 +12,14 @@ from models import Comment as Comment
 from forms import RegisterForm, LoginForm, CommentForm
 import bcrypt
 
-
 app = Flask(__name__)  # create an app
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flask_event_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'SE3155'
 
-
 # Bind SQLAlchemy db object to this Flask app
 db.init_app(app)
-
 
 # Setup models
 with app.app_context():
@@ -33,7 +29,6 @@ with app.app_context():
 # @app.route is a decorator. It gives the function "index" special powers.
 # In this case it makes it so anyone going to "your-url/" makes this function
 # get called. What it returns is what is shown as the web page
-# @app.route('/')
 @app.route('/index')
 def index():
     # check if a user is saved in session
@@ -44,18 +39,19 @@ def index():
 
 @app.route('/events', methods=['GET', 'POST'])
 def get_events():
-    # # retrieve user from database
-    # check if a user is saved in session
+    # retrieve user from database, check if a user is saved in session
     if session.get('user'):
         other_events = db.session.query(Event).filter(Event.user_id != session['user_id']).all()
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
         if request.method == "POST":
             if request.form.get("Sort_by_Names"):
-                other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
+                other_events = db.session.query(Event).order_by(Event.event_title).filter(
+                    Event.user_id != session['user_id']).all()
 
             elif request.form.get("Sort_by_Date"):
-                other_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
+                other_events = db.session.query(Event).order_by(Event.event_date).filter(
+                    Event.user_id != session['user_id']).all()
             elif request.form.get("like"):
                 like_toggle(request.form.get("like"))
             elif request.form.get("dislike"):
@@ -66,7 +62,52 @@ def get_events():
         elif request.method == "GET":
             print("This shouldn't appear")
 
-        return render_template('my_events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
+        return render_template('events.html', events=my_events, other_events=other_events, user=session['user'],
+                               userName=session['user_name'], user_id=session['user_id'])
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/rsvp', methods=['GET', 'POST'])
+def get_rsvp_events():
+    user_string = '|' + str(session['user_id']) + '|'
+
+    if session.get('user'):
+        rsvp_events = db.session.query(Event).filter(Event.rsvp.ilike(user_string)).all()
+
+        if request.method == "POST":
+            if request.form.get("Sort_by_Names"):
+                rsvp_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
+            elif request.form.get("Sort_by_Date"):
+                rsvp_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
+            elif request.form.get("like"):
+                like_toggle(request.form.get("like"))
+            elif request.form.get("dislike"):
+                dislike_toggle(request.form.get("dislike"))
+            elif request.form.get("rsvp"):
+                rsvp_toggle(request.form.get("rsvp"))
+        return render_template('rsvp.html', events=rsvp_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
+
+    return redirect(url_for('get_events'))
+
+
+@app.route('/myEvents', methods=['GET', 'POST'])
+def get_my_events():
+    # retrieve user from database, check if a user is saved in session
+    if session.get('user'):
+        my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
+
+        if request.method == "POST":
+            if request.form.get("Sort_mine_by_Name"):
+                my_events = db.session.query(Event).order_by(Event.event_title).filter(
+                    Event.user_id == session['user_id']).all()
+
+            elif request.form.get("Sort_mine_by_Date"):
+                my_events = db.session.query(Event).order_by(Event.event_date).filter(
+                    Event.user_id == session['user_id']).all()
+
+        return render_template('my_events.html', events=my_events, user=session['user'], userName=session['user_name'],
+                               user_id=session['user_id'])
     else:
         return redirect(url_for('login'))
 
@@ -111,29 +152,49 @@ def dislike_toggle(event_id):
             like_toggle(event_id)
 
 
-#RSVP TOGGLE
 def rsvp_toggle(event_id):
     event = db.session.query(Event).filter(Event.id == event_id).one()
+    current_user = db.session.query(User).filter(User.id == session['user_id']).one()
     user_string = '|' + str(session['user_id']) + '|'
+    event_string = '|' + str(event_id) + '|'
 
+    # removing user from RSVP
     if user_string in event.rsvp:
         replaced_string = event.rsvp.replace(user_string, '|')
+        replaced_user_string = current_user.rsvped_events.replace(event_string, '|')
         event.rsvp = replaced_string
+        current_user.rsvped_events = replaced_user_string
         db.session.commit()
+        increment_rsvp_counter(event_id, "sub")
 
+    # adding user from RSVP
     else:
         rsvp = event.rsvp + str(session['user_id']) + "|"
+        rsvped_events = current_user.rsvped_events + str(session['user_id']) + '|'
         event.rsvp = rsvp
+        current_user.rsvped_events = rsvped_events
         db.session.commit()
+        increment_rsvp_counter(event_id, "add")
 
 
 def increment_like_counter(event_id, action):
     event = db.session.query(Event).filter(Event.id == event_id).one()
 
     if action == 'add':
-        event.count += 1
+        event.like_count += 1
     elif action == 'sub':
-        event.count -= 1
+        event.like_count -= 1
+
+    db.session.commit()
+
+
+def increment_rsvp_counter(event_id, action):
+    event = db.session.query(Event).filter(Event.id == event_id).one()
+
+    if action == 'add':
+        event.rsvp_count += 1
+    elif action == 'sub':
+        event.rsvp_count -= 1
 
     db.session.commit()
 
@@ -206,7 +267,7 @@ def update_event(event_id):
             # retrieve user from database
             my_event = db.session.query(Event).filter_by(id=event_id).one()
 
-            return render_template('new_event.html', event=my_event, user=session['user'])
+            return render_template('new_event.html', event=my_event, user=session['user'], date="1991-01-12")
     else:
         # user is not in session redirect to login
         return redirect(url_for('login'))
@@ -289,7 +350,6 @@ def logout():
 
 @app.route('/events/<event_id>/comment', methods=['POST'])
 def new_comment(event_id):
-    print("event_id = ", event_id)
     if session.get('user'):
         comment_form = CommentForm()
         # validate_on_submit only validates using POST
@@ -306,14 +366,13 @@ def new_comment(event_id):
         return redirect(url_for('login'))
 
 
-def formatDate(date): 
+def formatDate(date):
     return date[5:7] + '-' + date[8:10] + '-' + date[0:4]
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(os.getenv('PORT', 5000)), debug=True)
 # To see the web page in your web browser, go to the url,
 #   http://127.0.0.1:5000
-
 # Note that we are running with "debug=True", so if you make changes and save it
 # the server will automatically update. This is great for development but is a
 # security risk for production.
