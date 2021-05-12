@@ -54,7 +54,7 @@
             <a href="{{ url_for('logout') }}">Logout</a>
         </nav> -->
 
-        <h1>Welcome {{user}} to Group 2 Many Guys' UNCC Events App!</h1>
+        <h1>Create an Event</h1>
 
         {% if event %}
         <form action="{{ url_for('update_event', event_id=event.id) }}" method="post">

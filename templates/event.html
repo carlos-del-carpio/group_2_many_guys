@@ -40,7 +40,7 @@
                 <h2>Comments</h2>
                 <ul>
                 {% for comment in event.comments %}
-                    <li>{{ event.content }}</li>
+                    <li>{{ comment.content }}</li>
                 {% endfor %}
                 </ul>
             {% endif %}
