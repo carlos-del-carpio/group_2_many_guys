@@ -22,16 +22,14 @@
             </nav>
         {% else %}
             <nav>
-                <a href="{{url_for('login') }}">Sign In</a> 
+                <a href="{{url_for('login') }}">Sign In ||</a> 
                 <a href="{{url_for('register') }}">Register</a>
             </nav>
         {% endif %}
 
-        <h1>Welcome {{user}} to Group 2 Many Guys' UNCC Events App!</h1>
-        <h2>Use this application to make and find events around UNCC</h2>
+        <center>
+        <h1> Welcome {{user}} to Group 2 Many Guys' UNCC Events App!</h1>
+        </center> 
 
-        <h3>Course notes</h3>
-        <h3>To Do</h3>
-        <h3>Work notes</h3>
     </body>
 </html>
