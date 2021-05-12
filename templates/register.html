@@ -14,7 +14,7 @@
             </nav>
         {% else %}
             <nav>
-                <a href="{{url_for('login') }}">Sign In</a> 
+                <a href="{{url_for('login') }}">Sign In ||</a> 
                 <a href="{{url_for('register') }}">Register</a>
             </nav>
         {% endif %}
@@ -22,9 +22,9 @@
         </div>
         <h1>Welcome {% if user %}{{user}}{% endif %}to Group 2 Many Guys' UNCC Events App!</h1>
 
-        <h2>Make your account by filling in the fields below \/</h2>
+        <h2>|</h2>
         <div class="formwrapper">
-            <h2 class="title">Register</h2>
+            <h2 class="title">Register Below</h2>
             <form method="POST" action="/register">
                 <div class="form-field">{{ form.firstname.label }} {{ form.firstname }}
                     {% if form.firstname.errors %}
