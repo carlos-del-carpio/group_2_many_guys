@@ -34,13 +34,11 @@ def get_events():
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
         if request.method == "POST":
-            if request.form.get("Sort_by_Names"):
-                other_events = db.session.query(Event).order_by(Event.event_title).filter(
-                    Event.user_id != session['user_id']).all()
+            if request.form.get("sort_by_name"):
+                other_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
 
-            elif request.form.get("Sort_by_Date"):
-                other_events = db.session.query(Event).order_by(Event.event_date).filter(
-                    Event.user_id != session['user_id']).all()
+            elif request.form.get("sort_by_date"):
+                other_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
             elif request.form.get("like"):
                 like_toggle(request.form.get("like"))
             elif request.form.get("dislike"):
@@ -51,8 +49,7 @@ def get_events():
         elif request.method == "GET":
             print("This shouldn't appear")
 
-        return render_template('events.html', events=my_events, other_events=other_events, user=session['user'],
-                               userName=session['user_name'], user_id=session['user_id'])
+        return render_template('events.html', events=my_events, other_events=other_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
     else:
         return redirect(url_for('login'))
 
@@ -64,17 +61,17 @@ def get_rsvp_events():
     if session.get('user'):
         rsvp_events = db.session.query(Event).filter(Event.rsvp.contains(user_string)).all()
         if request.method == "POST":
-            if request.form.get("Sort_by_Names"):
-                rsvp_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
-            elif request.form.get("Sort_by_Date"):
-                rsvp_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id != session['user_id']).all()
+            if request.form.get("sort_by_name"):
+                rsvp_events = db.session.query(Event).order_by(Event.event_title).filter(Event.rsvp.contains(user_string)).all()
+            elif request.form.get("sort_by_date"):
+                rsvp_events = db.session.query(Event).order_by(Event.event_date).filter(Event.rsvp.contains(user_string)).all()
             elif request.form.get("like"):
                 like_toggle(request.form.get("like"))
             elif request.form.get("dislike"):
                 dislike_toggle(request.form.get("dislike"))
             elif request.form.get("rsvp"):
                 rsvp_toggle(request.form.get("rsvp"))
-            rsvp_events = db.session.query(Event).filter(Event.rsvp.contains(user_string)).all()
+                rsvp_events = db.session.query(Event).filter(Event.rsvp.contains(user_string)).all()
         return render_template('rsvp.html', events=rsvp_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
 
     return redirect(url_for('get_events'))
@@ -87,16 +84,13 @@ def get_my_events():
         my_events = db.session.query(Event).filter_by(user_id=session['user_id']).all()
 
         if request.method == "POST":
-            if request.form.get("Sort_mine_by_Name"):
-                my_events = db.session.query(Event).order_by(Event.event_title).filter(
-                    Event.user_id == session['user_id']).all()
+            if request.form.get("sort_by_name"):
+                my_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id == session['user_id']).all()
 
-            elif request.form.get("Sort_mine_by_Date"):
-                my_events = db.session.query(Event).order_by(Event.event_date).filter(
-                    Event.user_id == session['user_id']).all()
+            elif request.form.get("sort_by_date"):
+                my_events = db.session.query(Event).order_by(Event.event_date).filter(Event.user_id == session['user_id']).all()
 
-        return render_template('my_events.html', events=my_events, user=session['user'], userName=session['user_name'],
-                               user_id=session['user_id'])
+        return render_template('my_events.html', events=my_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
     else:
         return redirect(url_for('login'))
 
