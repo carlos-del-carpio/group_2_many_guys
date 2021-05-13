@@ -10,12 +10,9 @@
     </head>
     <body>
         {% include 'navbar.html' %}
-
-        <nav>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </nav>
-
+        <br>
         <h1>RSVPed Events</h1>
+        <br>
         <h2>{{ user }}'s RSVPs</h2>
 
         <form method ="post" action="/rsvp", style="padding: 0 0 1em 0">

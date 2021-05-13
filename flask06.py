@@ -62,8 +62,7 @@ def get_rsvp_events():
     user_string = '|' + str(session['user_id']) + '|'
 
     if session.get('user'):
-        rsvp_events = db.session.query(Event).filter(Event.rsvp.ilike(user_string)).all()
-
+        rsvp_events = db.session.query(Event).filter(Event.rsvp.contains(user_string)).all()
         if request.method == "POST":
             if request.form.get("Sort_by_Names"):
                 rsvp_events = db.session.query(Event).order_by(Event.event_title).filter(Event.user_id != session['user_id']).all()
@@ -75,6 +74,7 @@ def get_rsvp_events():
                 dislike_toggle(request.form.get("dislike"))
             elif request.form.get("rsvp"):
                 rsvp_toggle(request.form.get("rsvp"))
+            rsvp_events = db.session.query(Event).filter(Event.rsvp.contains(user_string)).all()
         return render_template('rsvp.html', events=rsvp_events, user=session['user'], userName=session['user_name'], user_id=session['user_id'])
 
     return redirect(url_for('get_events'))
@@ -150,16 +150,16 @@ def rsvp_toggle(event_id):
     # removing user from RSVP
     if user_string in event.rsvp:
         replaced_string = event.rsvp.replace(user_string, '|')
-        replaced_user_string = current_user.rsvped_events.replace(event_string, '|')
+        replaced_event_string = current_user.rsvped_events.replace(event_string, '|')
         event.rsvp = replaced_string
-        current_user.rsvped_events = replaced_user_string
+        current_user.rsvped_events = replaced_event_string
         db.session.commit()
         increment_rsvp_counter(event_id, "sub")
 
     # adding user from RSVP
     else:
         rsvp = event.rsvp + str(session['user_id']) + "|"
-        rsvped_events = current_user.rsvped_events + str(session['user_id']) + '|'
+        rsvped_events = current_user.rsvped_events + str(event_id) + '|'
         event.rsvp = rsvp
         current_user.rsvped_events = rsvped_events
         db.session.commit()
@@ -198,7 +198,7 @@ def get_event(event_id, event_type):
             # retrieve note from database
             my_event = db.session.query(Event).filter_by(id=event_id).one()
         elif event_type == "other":
-            my_event = db.session.query(Event).filter(Event.id == event_id)
+            my_event = db.session.query(Event).filter(Event.id == event_id).one()
 
         return render_template('event.html', event=my_event, user=session['user'], form=form)
     else:

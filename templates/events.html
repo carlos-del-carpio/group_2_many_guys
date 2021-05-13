@@ -10,8 +10,9 @@
     </head>
     <body>
         {% include 'navbar.html' %}
-
+        <br>
         <h1>Explore Events</h1>
+        <br>
         <h2>Checkout These Events</h2>
         <form method ="post" action="/events", style="padding: 0 0 1em 0">
             <button type="get_events" name="Sort_by_Name" value="Sort_by_Name"> Sort by Name </button>
@@ -72,6 +73,7 @@
             {% endfor %}
         </table>
 
+        <br>
         <h2>My Events</h2>
         <table style="width: 100%">
             <colgroup>
@@ -79,6 +81,7 @@
                <col span="1" style="width: 10%;">
                <col span="1" style="width: 8%;">
                <col span="1" style="width: 10%;">
+               <col span="1" style="width: 5%;">
             </colgroup>
             <tr>
                 <th style="text-align: left;">Title</th>
